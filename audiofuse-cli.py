@@ -80,6 +80,8 @@ class AudioFuse:
         self._dev.ctrl_transfer(request_type, 0x03, 0x0200, 0x4c00, [0, 0])
 
     def set_digital_in(self, val):
+        if self._verbose:
+            print("Attempting to set digital in to: %s" % val)
         if val == self.input:
             if self._verbose:
                 print("Input already set correctly. Skipping.")
@@ -113,6 +115,8 @@ class AudioFuse:
         self._dev.ctrl_transfer(request_type, 0x03, 0x0105, 0x4600, [data])
 
     def set_digital_out(self, val):
+        if self._verbose:
+            print("Attempting to set digital out to: %s" % val)
         if val == self.output:
             if self._verbose:
                 print("Output already set correctly. Skipping.")
@@ -130,6 +134,8 @@ class AudioFuse:
         self._change_digital_out(val)
         if restart:
             self._change_digital_in(self.input)
+            # TODO: Wait and reconnect after restart. Otherwise a subsequent
+            # set_digital_in will fail.
 
     def attach(self):
         # Detach kernel driver if currently attached
@@ -153,8 +159,8 @@ class AudioFuse:
                 bad_match = False
                 for (byte_num, val) in tmpl_bytes:
                     b = arr[byte_num]
-                    checked_bytes[byte_num] = b
                     if b != val:
+                        checked_bytes[byte_num] = b
                         bad_match = True
                         break
                 if bad_match:
@@ -163,15 +169,15 @@ class AudioFuse:
             raise TemplateMatchError(checked_bytes)
 
         input_templates = [
-            (Input.SPDIF_coax,    [(23, 0), (29, 0)]),
-            (Input.SPDIF_optical, [(23, 1), (29, 0)]),
-            (Input.ADAT,          [(29, 1)]),
-            (Input.WClock,        [(29, 2)]),
+            (Input.SPDIF_coax,    [(22, 0), (28, 0)]),
+            (Input.SPDIF_optical, [(22, 1), (28, 0)]),
+            (Input.ADAT,          [(22, 1), (28, 1)]),
+            (Input.WClock,        [(22, 0), (28, 2)]),
         ]
         output_templates = [
-            (Output.SPDIF,  [(28, 0), (30, 0)]),
-            (Output.ADAT,   [(28, 0), (30, 1)]),
-            (Output.WClock, [(28, 1), (30, 2)]),
+            (Output.SPDIF,  [(27, 0), (29, 0)]),
+            (Output.ADAT,   [(27, 0), (29, 1)]),
+            (Output.WClock, [(27, 1), (29, 2)]),
         ]
 
         # Request the status of the Audiofuse
