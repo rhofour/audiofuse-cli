@@ -214,10 +214,10 @@ class AudioFuse:
 
 def main():
     parser = argparse.ArgumentParser(description="An unofficial, incomplete CLI for controlling the Arturia AudioFuse.")
+    parser.add_argument("-v", "--verbose", action='store_true')
     parser.add_argument("--digital_in", "--din", choices=["spdif-coax", "spdif-optical", "adat", "wclock"])
     parser.add_argument("--digital_out", "--dout", choices=["spdif", "adat", "wclock"])
-    parser.add_argument("-v", action='store_true')
-    parser.add_argument("--allow_restart", "-r", action='store_true')
+    parser.add_argument("-r", "--allow_restart", action='store_true')
     args = parser.parse_args()
 
     af = AudioFuse(args.v, args.allow_restart)
