@@ -1,0 +1,1 @@
+SUBSYSTEM=="usb", ACTION=="add", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="1c75", ATTRS{idProduct}=="af02", MODE="660", GROUP="audiofuse"
