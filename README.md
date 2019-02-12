@@ -17,6 +17,19 @@ While made primarily to bring Linux control to the AudioFuse, in theory this sho
       --digital_out {spdif,adat,wclock}, --dout {spdif,adat,wclock}
       -r, --allow_restart
 
+### Permissions
+On Linux by default this will require root. You can instead setup a udev rule to allow it to run as your user.
+
+First, create the group audiofuse and add yourself to it:
+* `sudo groupadd audiofuse`
+* `sudo usermod -a -G audiofuse $USER`
+
+Next, copy the udev rule into /etc/udev/rules.d and make sure root owns it:
+* `sudo cp 80-audiofuse.rules /etc/udev/rules.d/`
+* `sudo chown root:root /etc/udev/rules.d/80-audiofuse.rules`
+
+Finally, log out and back in to update the groups. You should now be able to run this without root.
+
 ## Capabilities
 This software is currently very incomplete. It is limited to the following:
 * Detecting how digital I/O is set (ADAT, SPDIF, World Clock)
