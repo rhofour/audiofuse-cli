@@ -27,3 +27,6 @@ Please use Github issues to report any bugs found or missing features you would 
 
 ## License
 This code is licensed under the GNU GPLv3 (see COPYING).
+
+## Disclaimer
+This is unofficial, reverse-engineered software. It's possible it may damage your AudioFuse or computer. Use at your own risk.
