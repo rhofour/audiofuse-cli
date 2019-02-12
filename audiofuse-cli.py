@@ -220,7 +220,7 @@ def main():
     parser.add_argument("-r", "--allow_restart", action='store_true')
     args = parser.parse_args()
 
-    af = AudioFuse(args.v, args.allow_restart)
+    af = AudioFuse(args.verbose, args.allow_restart)
     if af:
         print("Found an AudioFuse.")
     else:
