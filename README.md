@@ -13,9 +13,15 @@ While made primarily to bring Linux control to the AudioFuse, in theory this sho
     optional arguments:
       -h, --help            show this help message and exit
       -v, --verbose
+      -r, --allow_restart
       --digital_in {spdif-coax,spdif-optical,adat,wclock}, --din {spdif-coax,spdif-optical,adat,wclock}
       --digital_out {spdif,adat,wclock}, --dout {spdif,adat,wclock}
-      -r, --allow_restart
+      --from-phone-2        Set Speaker B to output the phones 2 mix.
+      --not-from-phone-2    Set Speaker B back to normal.
+      --reamping            Enable reamping over Speaker B left output.
+      --no-reamping         Disable reamping.
+      --ground-lift         Disconnect ground from the reamping circuit.
+      --no-ground-lift      Reconnect ground to the reamping circuit.
 
 ### Permissions
 On Linux by default this will require root. You can instead setup a udev rule to allow it to run as your user.
@@ -34,6 +40,7 @@ Finally, log out and back in to update the groups. You should now be able to run
 This software is currently very incomplete. It is limited to the following:
 * Detecting how digital I/O is set (ADAT, SPDIF, World Clock)
 * Setting digital I/O
+* Controlling the From Phone 2 section (From Phone 2, Reamping, and Ground Lift)
 
 ## Bugs and Feature Requests
 Please use Github issues to report any bugs found or missing features you would like to see implemented.
