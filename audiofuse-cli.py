@@ -137,6 +137,25 @@ class AudioFuse:
             # TODO: Wait and reconnect after restart. Otherwise a subsequent
             # set_digital_in will fail.
 
+    def _set_binary_option(self, name, usb_val, val):
+        if self._verbose:
+            print("Attempting to set %s to %d." % (name, val))
+
+        if not (val == 0 or val == 1):
+            raise ValueError
+
+        request_type = usb.util.build_request_type(CTRL_OUT, CTRL_TYPE_CLASS, CTRL_RECIPIENT_INTERFACE)
+        self._dev.ctrl_transfer(request_type, 0x03, usb_val, 0x4600, [val])
+
+    def set_from_phone_2(self, val): 
+        self._set_binary_option("from phones 2", 0x0a00, val)
+
+    def set_reamping(self, val): 
+        self._set_binary_option("reamping", 0x0b00, val)
+
+    def set_ground_lift(self, val): 
+        self._set_binary_option("ground lift", 0x0c00, val)
+
     def attach(self):
         # Detach kernel driver if currently attached
         for i in range(self._dev[0].bNumInterfaces): # Check all interfaces
@@ -215,19 +234,38 @@ class AudioFuse:
 def main():
     parser = argparse.ArgumentParser(description="An unofficial, incomplete CLI for controlling the Arturia AudioFuse.")
     parser.add_argument("-v", "--verbose", action='store_true')
+    parser.add_argument("-r", "--allow_restart", action='store_true')
     parser.add_argument("--digital_in", "--din", choices=["spdif-coax", "spdif-optical", "adat", "wclock"])
     parser.add_argument("--digital_out", "--dout", choices=["spdif", "adat", "wclock"])
-    parser.add_argument("-r", "--allow_restart", action='store_true')
+    parser.add_argument("--from-phone-2", action='store_true', help="Set Speaker B to output the phones 2 mix.")
+    parser.add_argument("--not-from-phone-2", action='store_true', help="Set Speaker B back to normal.")
+    parser.add_argument("--reamping", action='store_true', help="Enable reamping over Speaker B left output.")
+    parser.add_argument("--no-reamping", action='store_true', help="Disable reamping.")
+    parser.add_argument("--ground-lift", action='store_true', help="Disconnect ground from the reamping circuit.")
+    parser.add_argument("--no-ground-lift", action='store_true', help="Reconnect ground to the reamping circuit.")
     args = parser.parse_args()
 
-    af = AudioFuse(args.verbose, args.allow_restart)
-    if af:
-        print("Found an AudioFuse.")
-    else:
-        print("No AudioFuse found.")
-        sys.exit(1)
-    
     try:
+        af = AudioFuse(args.verbose, args.allow_restart)
+        if af:
+            print("Found an AudioFuse.")
+        else:
+            print("No AudioFuse found.")
+            sys.exit(1)
+    
+        # Validate arguments
+        if args.from_phone_2 and args.not_from_phone_2:
+            print("Cannot simultaneously set --from-phone-2 and --not-from-phone-2.")
+            sys.exit(1)
+
+        if args.reamping and args.no_reamping:
+            print("Cannot simultaneously set --reamping and --no-reamping.")
+            sys.exit(1)
+
+        if args.ground_lift and args.no_ground_lift:
+            print("Cannot simultaneously set --ground-lift and --no-ground-lift.")
+            sys.exit(1)
+
         if args.digital_out:
             try:
                 af.set_digital_out(Output[args.digital_out])
@@ -240,6 +278,25 @@ def main():
             except RequiresAllowRestart:
                 print("Setting digital in to %s requires a restart. Please re-run with --allow_restart." %
                         args.digital_in)
+
+        if args.from_phone_2:
+            af.set_from_phone_2(1)
+
+        if args.not_from_phone_2:
+            af.set_from_phone_2(0)
+
+        if args.reamping:
+            af.set_reamping(1)
+
+        if args.no_reamping:
+            af.set_reamping(0)
+
+        if args.ground_lift:
+            af.set_ground_lift(1)
+
+        if args.no_ground_lift:
+            af.set_ground_lift(0)
+
     except USBError as e:
         if e.errno is 13:
             print("Insufficient permission to talk to AudioFuse.")
