@@ -253,7 +253,7 @@ class AudioFuse:
             try:
                 self._dev.attach_kernel_driver(i)
             except USBError as e:
-                if e.errno is 2:
+                if e.errno == 2:
                     # This seems to happen whenever this is run after a
                     # self-initiated restart.
                     print("TODO: Figure out why we get entity not found here.")
@@ -277,10 +277,10 @@ def main():
     try:
         af = AudioFuse(args.verbose, args.allow_restart)
     except USBError as e:
-        if e.errno is 13:
+        if e.errno == 13:
             print("Insufficient permission to talk to AudioFuse.")
             sys.exit(1)
-        elif e.errno is 16:
+        elif e.errno == 16:
             print("AudioFuse is currently in use by another application.")
             sys.exit(1)
         raise
